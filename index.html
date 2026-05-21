@@ -3,99 +3,212 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resortes de León — Dashboard</title>
+  <title>Resortes de León — Registro de Producto No Vendido</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </head>
 <body>
 
   <!-- Header -->
-  <header class="hdr">
-    <div class="hdr-icon">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
-      </svg>
-    </div>
-    <div>
-      <div class="hdr-title">Resortes de León</div>
-      <div class="hdr-sub">Ventas · Mayo 2025 – Abril 2026</div>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Resortes de León</div>
+          <div class="brand-sub">Registro interno de sucursales</div>
+        </div>
+      </div>
+      <div class="header-tag">Producto no vendido</div>
     </div>
   </header>
 
-  <!-- Métricas -->
-  <section class="metrics" aria-label="Métricas principales">
-    <div class="metric">
-      <div class="metric-label">Ventas totales</div>
-      <div class="metric-value">Q1.15M</div>
-      <div class="metric-sub">Acumulado</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Unidades</div>
-      <div class="metric-value">314,941</div>
-      <div class="metric-sub">Piezas vendidas</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Mejor mes</div>
-      <div class="metric-value">Abr 2026</div>
-      <div class="metric-sub">Q249,700</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Empresas</div>
-      <div class="metric-value">2</div>
-      <div class="metric-sub">RECESA · REDELSA</div>
-    </div>
-  </section>
+  <main class="main">
 
-  <!-- Gráfico líneas -->
-  <div class="card">
-    <div class="card-title">Ventas mensuales</div>
-    <div class="card-sub">Evolución mayo 2025 – abril 2026</div>
-    <div class="chart-wrap" style="height:160px;">
-      <canvas id="lineChart" role="img" aria-label="Ventas mensuales de mayo 2025 a abril 2026"></canvas>
-    </div>
-  </div>
-
-  <!-- Gráfico barras -->
-  <div class="card">
-    <div class="card-title">RECESA vs REDELSA</div>
-    <div class="legend">
-      <span class="leg-item"><span class="leg-dot" style="background:#1a1a1a;"></span>RECESA</span>
-      <span class="leg-item"><span class="leg-dot" style="background:#F5C400;"></span>REDELSA</span>
-    </div>
-    <div class="chart-wrap" style="height:160px;">
-      <canvas id="barChart" role="img" aria-label="Ventas comparadas por empresa y mes"></canvas>
-    </div>
-  </div>
-
-  <!-- Participación -->
-  <div class="card">
-    <div class="card-title">Participación por empresa</div>
-    <div class="card-sub">% del total de ventas</div>
-    <div class="empresa-row">
-      <div class="emp-card">
-        <div class="emp-name">RECESA</div>
-        <div class="emp-total">Q181,935</div>
-        <div class="emp-qty">211,628 uds.</div>
-        <span class="emp-pct">15.9%</span>
+    <!-- Intro -->
+    <div class="intro-card">
+      <div class="intro-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
       </div>
-      <div class="emp-card">
-        <div class="emp-name">REDELSA</div>
-        <div class="emp-total">Q964,992</div>
-        <div class="emp-qty">103,313 uds.</div>
-        <span class="emp-pct">84.1%</span>
-      </div>
+      <p>Cada vez que un cliente solicite un producto y <strong>no se logre vender</strong>, completa este registro. No es necesario hacer análisis — solo anota la información de forma clara.</p>
     </div>
-    <div class="chart-wrap" style="height:130px;">
-      <canvas id="donutChart" role="img" aria-label="Dona: REDELSA 84% y RECESA 16%"></canvas>
-    </div>
-  </div>
 
-  <!-- Top productos -->
-  <div class="card">
-    <div class="card-title">Top 7 productos</div>
-    <div class="card-sub">Por ventas acumuladas</div>
-    <div id="products"></div>
-  </div>
+    <!-- Form -->
+    <form id="mainForm" novalidate>
+
+      <!-- Sección 1: Datos generales -->
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <div>
+            <h2 class="section-title">Datos generales</h2>
+            <p class="section-desc">Información básica de la consulta</p>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field">
+            <label for="fecha">Fecha <span class="req">*</span></label>
+            <input type="date" id="fecha" name="fecha" required />
+          </div>
+
+          <div class="field">
+            <label for="sucursal">Sucursal <span class="req">*</span></label>
+            <select id="sucursal" name="sucursal" required>
+              <option value="" disabled selected>Seleccionar sucursal…</option>
+              <option>Zona 8</option>
+              <option>Zona 9</option>
+              <option>Villa Nueva</option>
+              <option>Mixco</option>
+              <option>Zona 12</option>
+              <option>Otra</option>
+            </select>
+          </div>
+
+          <div class="field field-full">
+            <label for="cliente">Cliente / contacto</label>
+            <input type="text" id="cliente" name="cliente" placeholder="Nombre del cliente y teléfono si lo proporcionó" />
+          </div>
+
+          <div class="field">
+            <label for="tipo_cliente">Tipo de cliente <span class="req">*</span></label>
+            <select id="tipo_cliente" name="tipo_cliente" required>
+              <option value="" disabled selected>Seleccionar…</option>
+              <option>Constructor</option>
+              <option>Flotilla</option>
+              <option>Taller</option>
+              <option>Ingenio</option>
+              <option>Empresa</option>
+              <option>Particular</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección 2: Producto -->
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <div>
+            <h2 class="section-title">Producto solicitado</h2>
+            <p class="section-desc">Qué pidió el cliente</p>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field">
+            <label for="codigo">Código interno</label>
+            <input type="text" id="codigo" name="codigo" placeholder="Ej: LRC12310 — si no existe, escribe Sin código" />
+          </div>
+
+          <div class="field">
+            <label for="cantidad">Cantidad solicitada <span class="req">*</span></label>
+            <input type="number" id="cantidad" name="cantidad" min="1" placeholder="Ej: 12" required />
+          </div>
+
+          <div class="field field-full">
+            <label for="producto">Nombre del producto <span class="req">*</span></label>
+            <input type="text" id="producto" name="producto" placeholder="Nombre tal como lo solicitó el cliente" required />
+          </div>
+
+          <div class="field field-full">
+            <label for="medida">Medida / especificación</label>
+            <input type="text" id="medida" name="medida" placeholder="Medida, largo, grosor, rosca, hojas, muestra, código del cliente…" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección 3: Motivo -->
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <div>
+            <h2 class="section-title">¿Por qué no se vendió?</h2>
+            <p class="section-desc">Selecciona el motivo principal</p>
+          </div>
+        </div>
+
+        <div class="motivos-grid" id="motivosGrid">
+          <!-- Generado por JS -->
+        </div>
+
+        <div class="field" style="margin-top:16px;" id="otroWrap" hidden>
+          <label for="otro_motivo">Describe el motivo <span class="req">*</span></label>
+          <input type="text" id="otro_motivo" name="otro_motivo" placeholder="Escribe el motivo aquí…" />
+        </div>
+      </section>
+
+      <!-- Sección 4: Observaciones -->
+      <section class="form-section">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <div>
+            <h2 class="section-title">Observaciones</h2>
+            <p class="section-desc">Cualquier dato adicional que ayude a entender el caso</p>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field field-full">
+            <label for="observaciones">Observaciones (opcional)</label>
+            <textarea id="observaciones" name="observaciones" rows="3" placeholder="Ej: Cliente necesitaba el producto para el mismo día, ofreció comprar por volumen, dejó muestra, etc."></textarea>
+          </div>
+
+          <div class="field field-full">
+            <label for="vendedor">Nombre del vendedor que atendió <span class="req">*</span></label>
+            <input type="text" id="vendedor" name="vendedor" placeholder="Tu nombre" required />
+          </div>
+        </div>
+      </section>
+
+      <!-- Acciones -->
+      <div class="form-actions">
+        <button type="button" id="btnLimpiar" class="btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+          Limpiar
+        </button>
+        <button type="submit" id="btnGuardar" class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Guardar registro
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <!-- Registros guardados -->
+    <section id="historySection" class="history-section" hidden>
+      <div class="history-header">
+        <div>
+          <h2 class="history-title">Registros guardados</h2>
+          <p class="history-sub" id="historyCount"></p>
+        </div>
+        <div class="history-actions">
+          <button id="btnExport" class="btn-outline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar CSV
+          </button>
+          <button id="btnClearAll" class="btn-danger-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Borrar todo
+          </button>
+        </div>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+  </main>
 
   <script src="script.js"></script>
 </body>

@@ -3,7 +3,7 @@
  * Sistema de reenvío automático para registros pendientes
  */
 
-const SCRIPT_URL = "https://script.google.com/macros/u/2/s/AKfycbyZUJY_W8FwzWvhJ2_WjRhqsNmaT43w_Bgd-Hkdelh4_jses48S_IRL485CUIRbzBXYMA/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybpe9aVUiOSHKvXE-7k9p66hvipHhSLP5Vhw5jeUgGpyIVROGpqdVzkD3M6tjVdsbaUw/exec";
 
 const MOTIVOS = [
   "No había inventario",

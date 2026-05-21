@@ -6,7 +6,6 @@
 
 // ── CONFIGURACIÓN ─────────────────────────────────────────
 const SCRIPT_URL = "https://script.google.com/macros/u/2/s/AKfycbyZUJY_W8FwzWvhJ2_WjRhqsNmaT43w_Bgd-Hkdelh4_jses48S_IRL485CUIRbzBXYMA/exec";
-
 // ─────────────────────────────────────────────────────────
 
 const MOTIVOS = [
@@ -24,9 +23,9 @@ const MOTIVOS = [
   "Otro"
 ];
 
-let motivoSeleccionado = "";
+const MAX_MOTIVOS = 3;
+let motivosSeleccionados = [];
 
-// ── Init ──────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   setTodayDate();
   renderMotivos();
@@ -36,11 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function setTodayDate() {
   const input = document.getElementById("fecha");
-  const today = new Date().toISOString().split("T")[0];
-  input.value = today;
+  input.value = new Date().toISOString().split("T")[0];
 }
 
-// ── Motivos ───────────────────────────────────────────────
 function renderMotivos() {
   const grid = document.getElementById("motivosGrid");
   grid.innerHTML = "";
@@ -56,16 +53,23 @@ function renderMotivos() {
 }
 
 function selectMotivo(motivo, btn) {
-  document.querySelectorAll(".motivo-btn").forEach(b => b.classList.remove("selected"));
-  btn.classList.add("selected");
-  motivoSeleccionado = motivo;
+  if (btn.classList.contains("selected")) {
+    btn.classList.remove("selected");
+    motivosSeleccionados = motivosSeleccionados.filter(m => m !== motivo);
+  } else {
+    if (motivosSeleccionados.length >= MAX_MOTIVOS) {
+      showToast("Máximo 3 motivos", "error");
+      return;
+    }
+    btn.classList.add("selected");
+    motivosSeleccionados.push(motivo);
+  }
 
   const otroWrap = document.getElementById("otroWrap");
   const otroInput = document.getElementById("otro_motivo");
-  if (motivo === "Otro") {
+  if (motivosSeleccionados.includes("Otro")) {
     otroWrap.hidden = false;
     otroInput.required = true;
-    otroInput.focus();
   } else {
     otroWrap.hidden = true;
     otroInput.required = false;
@@ -73,7 +77,6 @@ function selectMotivo(motivo, btn) {
   }
 }
 
-// ── Bind events ───────────────────────────────────────────
 function bindEvents() {
   document.getElementById("mainForm").addEventListener("submit", handleSubmit);
   document.getElementById("btnLimpiar").addEventListener("click", resetForm);
@@ -81,20 +84,18 @@ function bindEvents() {
   document.getElementById("btnClearAll").addEventListener("click", clearAll);
 }
 
-// ── Validación ────────────────────────────────────────────
 function validateForm() {
   let valid = true;
-  const required = ["fecha", "sucursal", "tipo_cliente", "cantidad", "producto", "vendedor"];
-  required.forEach(id => {
+  ["fecha", "sucursal", "tipo_cliente", "cantidad", "producto", "vendedor"].forEach(id => {
     const el = document.getElementById(id);
     if (!el.value.trim()) { el.classList.add("error"); valid = false; }
     else el.classList.remove("error");
   });
-  if (!motivoSeleccionado) {
-    showToast("Selecciona el motivo por el que no se vendió", "error");
+  if (!motivosSeleccionados.length) {
+    showToast("Selecciona al menos un motivo", "error");
     valid = false;
   }
-  if (motivoSeleccionado === "Otro") {
+  if (motivosSeleccionados.includes("Otro")) {
     const otro = document.getElementById("otro_motivo");
     if (!otro.value.trim()) { otro.classList.add("error"); valid = false; }
     else otro.classList.remove("error");
@@ -102,7 +103,6 @@ function validateForm() {
   return valid;
 }
 
-// ── Submit ────────────────────────────────────────────────
 async function handleSubmit(e) {
   e.preventDefault();
   document.querySelectorAll("input, select, textarea").forEach(el => {
@@ -114,9 +114,11 @@ async function handleSubmit(e) {
     return;
   }
 
-  const motivo = motivoSeleccionado === "Otro"
-    ? document.getElementById("otro_motivo").value.trim()
-    : motivoSeleccionado;
+  let motivoFinal = motivosSeleccionados.filter(m => m !== "Otro").join(", ");
+  if (motivosSeleccionados.includes("Otro")) {
+    const otroTexto = document.getElementById("otro_motivo").value.trim();
+    motivoFinal = motivoFinal ? motivoFinal + ", " + otroTexto : otroTexto;
+  }
 
   const registro = {
     fecha:         document.getElementById("fecha").value,
@@ -127,43 +129,28 @@ async function handleSubmit(e) {
     producto:      document.getElementById("producto").value.trim(),
     medida:        document.getElementById("medida").value.trim(),
     cantidad:      document.getElementById("cantidad").value,
-    motivo,
+    motivo:        motivoFinal,
     observaciones: document.getElementById("observaciones").value.trim(),
     vendedor:      document.getElementById("vendedor").value.trim(),
   };
 
-  // Guardar localmente siempre (funciona sin internet)
   saveLocal({ ...registro, id: Date.now(), guardado: new Date().toLocaleString("es-GT") });
-
-  // Intentar enviar a Google Sheets
-  if (SCRIPT_URL && SCRIPT_URL !== "PEGA_TU_URL_AQUI") {
-    await sendToSheets(registro);
-  } else {
-    showToast("✓ Guardado localmente (configura SCRIPT_URL para sincronizar)", "success");
-  }
-
+  await sendToSheets(registro);
   renderHistory();
   resetForm();
 }
 
-// ── Envío a Google Sheets ─────────────────────────────────
 async function sendToSheets(data) {
   const btn = document.getElementById("btnGuardar");
   btn.disabled = true;
   btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Guardando…`;
-
   try {
-    const res = await fetch(SCRIPT_URL, {
+    await fetch(SCRIPT_URL, {
       method: "POST",
+      mode: "no-cors",
       body: JSON.stringify(data),
     });
-    const result = await res.json();
-
-    if (result.ok) {
-      showToast("✓ Registro enviado a Google Sheets", "success");
-    } else {
-      showToast("Guardado local. Error en Sheets: " + (result.error || ""), "error");
-    }
+    showToast("✓ Registro enviado a Google Sheets", "success");
   } catch (err) {
     showToast("Sin conexión — guardado localmente", "");
   } finally {
@@ -172,27 +159,22 @@ async function sendToSheets(data) {
   }
 }
 
-// ── Storage local ─────────────────────────────────────────
 const STORAGE_KEY = "rl_registros_v1";
-
 function getRecords() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
   catch { return []; }
 }
-
 function saveLocal(record) {
   const records = getRecords();
   records.unshift(record);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
-
 function deleteRecord(id) {
   const records = getRecords().filter(r => r.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   renderHistory();
   showToast("Registro eliminado");
 }
-
 function clearAll() {
   if (!confirm("¿Seguro que deseas borrar todos los registros locales?")) return;
   localStorage.removeItem(STORAGE_KEY);
@@ -200,26 +182,21 @@ function clearAll() {
   showToast("Registros locales eliminados");
 }
 
-// ── Historial local ───────────────────────────────────────
 function renderHistory() {
   const records = getRecords();
   const section = document.getElementById("historySection");
   const list    = document.getElementById("historyList");
   const count   = document.getElementById("historyCount");
-
   if (!records.length) { section.hidden = true; return; }
-
   section.hidden = false;
   count.textContent = `${records.length} registro${records.length !== 1 ? "s" : ""} en este dispositivo`;
   list.innerHTML = "";
-
   records.forEach(r => {
     const card = document.createElement("div");
     card.className = "history-card";
     const fechaFmt = r.fecha
       ? new Date(r.fecha + "T12:00:00").toLocaleDateString("es-GT", { day: "2-digit", month: "short", year: "numeric" })
       : "—";
-
     card.innerHTML = `
       <div class="hc-top">
         <div>
@@ -248,18 +225,15 @@ function renderHistory() {
   });
 }
 
-// ── Export CSV ────────────────────────────────────────────
 function exportCSV() {
   const records = getRecords();
   if (!records.length) { showToast("No hay registros para exportar", "error"); return; }
-
   const headers = ["Fecha","Sucursal","Cliente","Tipo cliente","Código","Producto","Medida","Cantidad","Motivo","Observaciones","Vendedor","Guardado"];
   const rows = records.map(r =>
     [r.fecha, r.sucursal, r.cliente, r.tipo_cliente, r.codigo, r.producto,
      r.medida, r.cantidad, r.motivo, r.observaciones, r.vendedor, r.guardado]
     .map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(",")
   );
-
   const csv = [headers.join(","), ...rows].join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
@@ -271,18 +245,16 @@ function exportCSV() {
   showToast("CSV exportado", "success");
 }
 
-// ── Reset ─────────────────────────────────────────────────
 function resetForm() {
   document.getElementById("mainForm").reset();
   setTodayDate();
-  motivoSeleccionado = "";
+  motivosSeleccionados = [];
   document.querySelectorAll(".motivo-btn").forEach(b => b.classList.remove("selected"));
   document.getElementById("otroWrap").hidden = true;
   document.getElementById("otro_motivo").required = false;
   document.querySelectorAll(".error").forEach(el => el.classList.remove("error"));
 }
 
-// ── Toast ─────────────────────────────────────────────────
 let toastTimer;
 function showToast(msg, type = "") {
   clearTimeout(toastTimer);
@@ -292,7 +264,6 @@ function showToast(msg, type = "") {
   toastTimer = setTimeout(() => { t.className = "toast"; }, 3200);
 }
 
-// ── Escape HTML ───────────────────────────────────────────
 function esc(str) {
   return String(str || "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;")

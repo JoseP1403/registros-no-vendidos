@@ -6,7 +6,7 @@
 
 // ── CONFIGURACIÓN ─────────────────────────────────────────
 // Pega aquí la URL que te da Google Apps Script al implementar
-const SCRIPT_URL = "PEGA_TU_URL_AQUI";
+const SCRIPT_URL = "const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqsfujvTYfD5NDx4mHrNzMNeNFTif0Q5rjrtgdHtrECB9lF-6oZ5wrjSFG4o_WNZxPFQ/exec";";
 // ─────────────────────────────────────────────────────────
 
 const MOTIVOS = [
